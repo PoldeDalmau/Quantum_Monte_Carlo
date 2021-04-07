@@ -32,6 +32,7 @@ You will find how to include [links](https://docs.gitlab.com/ee/user/markdown.ht
 useful.
 
 ## Week 1
+Pol: Made a function capable of sampling following a markov chain [mcmc_sample](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L23). Computed energies for the harmonic oscillator (see [Figures](Figures/table with energies.JPG)) as done in Jos Thijssen's book (chapter 12.2.2). The computations are quite slow if the variance is to be comparable to the literature's because many points need to be sampled (~ 15_000_000). It might be possible to remove for-loops in the mcmc_sample function.
 (due before 21 April)
 
 
