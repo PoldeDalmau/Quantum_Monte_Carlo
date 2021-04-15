@@ -31,23 +31,31 @@ def mcmc_sample(hops,pdf, pdfparam):
         number of sampled points
     pdfparam: list
         parameters that the pdf takes (if normal, standard deviation, mean...)    
+        
+    possible improvement: make number of walkers a controllable parameter.
     """
     states = []
     n_accepted = 0
+    r_rp = np.zeros(hops)
+    rp_r = np.zeros(hops)
     current = random.uniform(-3,3)                      # generates numbers around the mean in a uniform way, only for the first position of the "walker"
     for i in range(hops):                               # hops is the number of times you "hop", i.e. nr of steps...
         states.append(current)
         movement = current + random.uniform(-hop_size,hop_size)
         
         curr_prob = pdf(current, *pdfparam)
-        move_prob = pdf(movement, *pdfparam)
+        move_prob = pdf(movement, *pdfparam)            # same prob from 1 to 2 than from 2 to 1, easier in cartesian. Book by jos uses spherical -> would need some scaling 
+                                                        # to account for different volume in spherical shells of different radius. Probably it would be a factor r/r'
         
         acceptance = min(move_prob/curr_prob,1)         # acceptance is A_RR'
+        invacceptance = min(curr_prob/move_prob,1)
+        r_rp[i] = acceptance * curr_prob
+        rp_r[i] = invacceptance * move_prob
         if random_coin(acceptance):
             current = movement
             n_accepted += 1
     #print ("accepted/total =", n_accepted/hops)
-    return states[burn_in:], n_accepted/hops                            # give the system some time to find a reasonable starting point. 
+    return states[burn_in:], n_accepted/hops, r_rp[burn_in:], rp_r[burn_in:]                            # give the system some time to find a reasonable starting point. 
 
 
 
@@ -118,9 +126,9 @@ def integrate(pdff, func, param, funcparam):
     Integrates a given function's product with the pdf from the mcmc_sample function
     mu=mu,sigma=sigma
     """
-    dist, accept_ratio = mcmc_sample(hops=n_samples, pdf = pdff, pdfparam=param)
+    dist, accept_ratio, r_rp, rp_r = mcmc_sample(hops=n_samples, pdf = pdff, pdfparam=param)
     dist = np.array(dist)
     sampled = func(dist, *funcparam)
     integral = np.average(sampled)
     err = np.var(sampled)
-    return integral, err, accept_ratio
+    return integral, err, accept_ratio, r_rp, rp_r

@@ -32,11 +32,11 @@ You will find how to include [links](https://docs.gitlab.com/ee/user/markdown.ht
 useful.
 
 ## Week 1
-Pol: Made a function capable of sampling following a markov chain [mcmc_sample](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L23). Computed energies for the harmonic oscillator (see [Figures](Figures/Harmonic oscillator energies.JPG)) as done in Jos Thijssen's book ([chapter 12.2.2](Figures/table with energies.JPG)). The computations are quite slow (few minutes) if the variance is to be comparable to the literature's because many points need to be sampled (~ 15_000_000, literature uses 400*30_000 = 12_000_000, about the same...). It might be possible to remove for-loops in the mcmc_sample function.
+Pol: Made a function capable of sampling following a markov chain [mcmc_sample](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L23). Computed energies for the harmonic oscillator (see [Figures](Figures/Harmonic oscillator energies.JPG)) as done in Jos Thijssen's book ([chapter 12.2.2](Figures/table with energies.JPG)). The computations are quite slow (few minutes) samples as large as the literature's are taken (~ 15_000_000, literature uses 400*30_000 = 12_000_000, about the same...). It might be possible to remove for-loops in the mcmc_sample function.
 Next steps:
 -modify code to have a desired number of walkers each taking a desired number of hops.
 -Check for detailed balance
-    -condition for detailed balance in our code and for cartesian coordinates (detailed balance can be checked using eq. 10.15 on page 301)
+    -condition for detailed balance in our code and for cartesian coordinates (detailed balance can be checked using eq. 10.15 on page 301 from the book)
 -Once the above is done, Hydrogen atom integrals can be computed.
 (due before 21 April)
 
