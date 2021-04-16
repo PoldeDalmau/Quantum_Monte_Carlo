@@ -32,15 +32,15 @@ You will find how to include [links](https://docs.gitlab.com/ee/user/markdown.ht
 useful.
 
 ## Week 1
-Made a function capable of sampling following a markov chain [mcmc_sample](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L23). Computed energies for the harmonic oscillator (see [here](Figures/Harmonic oscillator energies.JPG)) and Jos Thijssen's book ([chapter 12.2.2](Figures/table with energies.JPG)). The computations are quite slow (few minutes) samples as large as the literature's are taken (~ 15_000_000, literature uses 400*30_000 = 12_000_000, about the same...). It might be possible to remove for-loops in the mcmc_sample function. Condition for detailed balance in our code is met and is calculated [here](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L50-53) and plotted [here](Project-2---QMC_pdedalmauhugue/Figures/Detailed balance.pdf). In the figure we show a histogram of the difference $A_{R' R}p(R') - A_{R' R}p(R')$. As expected, this difference is zero within python's rounding error (1e-17).
+Made a function capable of sampling following a markov chain [mcmc_sample](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L23). Computed energies for the harmonic oscillator (see [here](Figures/Harmonic oscillator energies.JPG)) and Jos Thijssen's book ([chapter 12.2.2](Figures/table with energies.JPG)). The computations are quite slow (few minutes) samples as large as the literature's are taken (~ 15_000_000, literature uses 400*30_000 = 12_000_000, about the same...). It might be possible to remove for-loops in the mcmc_sample function. Condition for detailed balance in our code is met and is calculated [here](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L50-53) and plotted [here](Figures/Detailed balance.pdf). In the figure we show a histogram of the difference \[A_{R' R}p(R') - A_{R' R}p(R')\]. As expected, this difference is zero within python's rounding error (1e-17).
 
 
 Next steps:
--Pol: modify code to have a desired number of walkers each taking a desired number of hops.
--Matteo: Include error of the mean calculation from previous project.
--Alberto: Change code to sample functions of more than one variable.
+-Pol: modify code to have a desired number of walkers each taking a desired number of hops. \\
+-Matteo: Include error of the mean calculation from previous project.\\
+-Alberto: Change code to sample functions of more than one variable.\\
 
--Once the above is done, Hydrogen atom integrals will become possible to compute. Later, we will simply extend the number of variables from three (3D hydrogen) to six (two particles with three coordinates each in He atom). Also, we will need to implement proper minimization.
+-Once the above is done, Hydrogen atom integrals will become possible to compute. Later, we will simply extend the number of variables from three (3D hydrogen) to six (two particles with three coordinates each in He atom). Also, we will need to implement proper minimization.\\
 (due before 21 April)
 
 
