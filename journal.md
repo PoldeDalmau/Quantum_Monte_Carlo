@@ -35,8 +35,9 @@ useful.
 Made a function capable of sampling following a markov chain [mcmc_sample](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L23). Computed energies for the harmonic oscillator (see Fig. 1 below) and Jos Thijssen's book ([chapter 12.2.2](Figures/table with energies.JPG)). The computations are quite slow (few minutes) samples as large as the literature's are taken (~ 15_000_000, literature uses 400*30_000 = 12_000_000, about the same...). It might be possible to remove for-loops in the mcmc_sample function. Condition for detailed balance in our code is met and is calculated [here](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L50-53) and plotted in figure 2. In the figure we show a histogram of the difference $`A_{R' R}p(R') - A_{R' R}p(R')`$. As expected, this difference is zero within python's rounding error (1e-17).
 
 
-![Harmonic oscillator energies plot](Figures/Harmonic oscillator energies plot.JPG | width=100)Fig. 1: Harmonic oscillator energies.
-![Detailed Balance](Figures/Detailed balance.JPG | width=100)Fig. 2: Histogram of $`A_{R' R}p(R') - A_{R' R}p(R')`$.
+![Harmonic oscillator energies plot](Figures/Harmonic oscillator energies plot.JPG)Fig. 1: Harmonic oscillator energies.
+
+![Detailed Balance](Figures/Detailed balance.JPG)Fig. 2: Histogram of $`A_{R' R}p(R') - A_{R' R}p(R')`$.
 
 (due before 21 April)
 
