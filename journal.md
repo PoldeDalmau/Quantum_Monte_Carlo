@@ -56,7 +56,7 @@ Once the above is done, Hydrogen atom integrals will become possible to compute.
 
 In figure 3 one can clearly see that each walker is a separate and independent object. A small hop size is used, otherwise it is too hard to discern each walker's path.
 
-![](Figures/walkers visualized.JPG | width=100)Fig. 3: 5 walkers with hop size = 0.01.
+![walkers](Figures/walkers visualized.JPG) Fig. 3: 5 walkers with hop size = 0.01.
 
 ## Week 3
 (due before 5 May)
