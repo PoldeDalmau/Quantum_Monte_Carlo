@@ -144,7 +144,8 @@ def psi_Hydrogen(x,y,z, alpha):
         Can it be complex?
 """
     r = np.sqrt(x**2+y**2+z**2)
-    return 4*np.pi*(r**2)*(alpha**3)/(8*np.pi)*np.exp(-2*alpha*r)
+    normalization = 5.545728835951373 #np.sqrt(np.pi/(2*alpha))**3
+    return 1.75*(r**2)*np.exp(-2*alpha*r)/normalization
 
 def psi2_Harmonic(x, alpha):
     """Trial wavefunction squared for the Hydrogen atom's ground state 
@@ -194,18 +195,22 @@ def integrate(pdff, func, param, funcparam):
     err = np.var(sampled)
     return integral, err, accept_ratio, r_rp, rp_r, dist
 
-def plot_dist(dist_, n_bins, pdf, param):
-    plt.hist(dist_, density=True, bins=n_bins)
+def plot_dist(x,y,z,dist_, n_bins, pdf, param):
     
     #normalization = np.sqrt(np.pi * param * 2)
-    x = np.linspace(0,3.5, 100)
-    y = np.linspace(0,3.5, 100)
-    z = np.linspace(0,3.5, 100)
-    f = pdf(x, x, x, param)#/normalization
+    #x = np.linspace(0,3.5, 100)
+    #y = np.linspace(0,3.5, 100)
+    #z = np.linspace(0,3.5, 100)
+    f = pdf(x, y, z, param)#/normalization
+    r = np.linspace(0,20, 100)
+    f2= pdf(r,0,0,param)
     plt.title("Histogram of sampled points")
-    plt.plot(3.2*x,5.5*f, label = "expected distribution")
-    plt.legend()
+    #plt.scatter(np.sqrt(x**2+y**2+z**2),f, c = "r", label = "expected distribution")
+    plt.plot(r, f2, label = "expected distribution", c = "r")
     plt.ylabel("Counts")
     plt.xlabel("r")
-    
+
+    plt.hist( dist_, density=True, bins=n_bins, alpha = 0.5, label = "Sampled data")
+    plt.legend()
+
     plt.show()
