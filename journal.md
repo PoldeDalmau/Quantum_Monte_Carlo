@@ -35,9 +35,13 @@ useful.
 Made a function capable of sampling following a markov chain [mcmc_sample](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L23). Computed energies for the harmonic oscillator (see Fig. 1 below) and Jos Thijssen's book ([chapter 12.2.2](Figures/table with energies.JPG)). The computations are quite slow (few minutes) samples as large as the literature's are taken (~ 15_000_000, literature uses 400*30_000 = 12_000_000, about the same...). It might be possible to remove for-loops in the mcmc_sample function. Condition for detailed balance in our code is met and is calculated [here](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L50-53) and plotted in figure 2. In the figure we show a histogram of the difference $`A_{R' R}p(R') - A_{R' R}p(R')`$. As expected, this difference is zero within python's rounding error (1e-17).
 
 
-![Harmonic oscillator energies plot](Figures/Harmonic oscillator energies plot.JPG)Fig. 1: Harmonic oscillator energies.
+![Harmonic oscillator energies plot](Figures/Harmonic oscillator energies plot.JPG)
 
-![Detailed Balance](Figures/Detailed balance.JPG)Fig. 2: Histogram of $`A_{R' R}p(R') - A_{R' R}p(R')`$.
+Fig. 1: Harmonic oscillator energies.
+
+![Detailed Balance](Figures/Detailed balance.JPG)
+
+Fig. 2: Histogram of $`A_{R' R}p(R') - A_{R' R}p(R')`$.
 
 (due before 21 April)
 
@@ -48,15 +52,17 @@ Made a function capable of sampling following a markov chain [mcmc_sample](https
 
 Milestones:
 
-    - [x] Pol: modify code to have a desired number of walkers each taking a desired number of hops.
-    - [] Matteo: Include error of the mean calculation from previous project.
-    - [] Alberto: Change code to sample functions of more than one variable.
+    - Pol: modify code to have a desired number of walkers each taking a desired number of hops.
+    - Matteo: Include error of the mean calculation from previous project.
+    - Alberto: Change code to sample functions of more than one variable.
 
 Once the above is done, Hydrogen atom integrals will become possible to compute. Later, we will simply extend the number of variables from three (3D hydrogen) to six (two particles with three coordinates each in He atom). Also, we will need to implement proper minimization.
 
-In figure 3 one can clearly see that each walker is a separate and independent object. A small hop size is used, otherwise it is too hard to discern each walker's path.
+In figure 3 one can clearly see that each walker is a separate and independent object. A small hop size is used, otherwise it is too hard to discern each walker's path. What still needs to be added is a way to remove the first few steps (~3000) of each walker in order to ensure that each walker is at equilibrium.
 
-![walkers](Figures/walkers visualized.JPG) Fig. 3: 5 walkers with hop size = 0.01.
+![walkers](Figures/walkers visualized.JPG)
+
+Fig. 3: 5 walkers with hop size = 0.01.
 
 ## Week 3
 (due before 5 May)
