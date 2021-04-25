@@ -64,11 +64,17 @@ In figure 3 one can clearly see that each walker is a separate and independent o
 
 Fig. 3: 5 walkers with hop size = 0.01.
 
-All the milestones have been achieved. As shown above, we can have a desired amount of walkers each taking a desired amount of hops. Also, we implemented a function that computes the error and we can sample functions in 3D (specifically, an hydrogen atom). The results for the hydrogen atom are convincing. Figure 4 below shows the histogram of the sampled distribution and the expected plot for the hydrogen atom. The two overlap, demonstrating that the simulation works correctly. Also, the results for energy given by the [Integrate_3D](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L195-215) function are in accordance with the data present in the table from the book "Computational physics" by Jos Thijssen.
+All the milestones have been achieved. As shown above, we can have a desired amount of walkers each taking a desired amount of hops. Also, we implemented a function that computes the [error](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L254-269) and we can sample functions in 3D with the [mcmc_sample_3D](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L61-109) (specifically, an hydrogen atom). The results for the hydrogen atom are convincing. Figure 4 below shows the histogram of the sampled distribution and the expected plot for the hydrogen atom. The two overlap, demonstrating that the simulation works correctly. Also, the results for energy given by the [Integrate_3D](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L195-215) function are in accordance with the data present in the table from the book "Computational physics" by Jos Thijssen, as shown in figure 5 below.
 
-![Hydrogen](Figures/Hydrogen - Sampled vs expected.jpeg)
+![Hydrogen_sample](Figures/Hydrogen - Sampled vs expected.jpeg)
 
 Fig. 4: Histogram of sampled points for an Hydrogen atom and the expected distribution
+
+![Hydrogen_energy_plot](Figures/Hydrogen energy plot.jpeg)
+
+Fig. 5: Plot of energies for an Hydrogen atom for different variational paramenters
+
+
 
 ## Week 3
 (due before 5 May)
