@@ -93,11 +93,7 @@ def mcmc_sample_3D(hops,pdf, pdfparam):
             current_y = random.uniform(-4,4)
             current_z = random.uniform(-4,4)
         curr_prob = pdf(current_x, current_y, current_z, *pdfparam)
-        move_prob = pdf(movement_x, movement_y, movement_z,  *pdfparam)
-        #curr_y_prob = pdf(current_y, *pdfparam)
-        #move_y_prob = pdf(movement_y, *pdfparam)
-        #curr_z_prob = pdf(current_z, *pdfparam)
-        #move_z_prob = pdf(movement_z, *pdfparam)        # same prob from 1 to 2 than from 2 to 1, easier in cartesian. Book by jos uses spherical -> would need some scaling 
+        move_prob = pdf(movement_x, movement_y, movement_z,  *pdfparam)       # same prob from 1 to 2 than from 2 to 1, easier in cartesian. Book by jos uses spherical -> would need some scaling 
                                                         # to account for different volume in spherical shells of different radius. Probably it would be a factor r/r'
         acceptance = min(move_prob/curr_prob,1)         # acceptance is A_RR'
         invacceptance = min(curr_prob/move_prob,1)
