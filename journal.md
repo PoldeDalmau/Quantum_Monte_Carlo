@@ -64,6 +64,12 @@ In figure 3 one can clearly see that each walker is a separate and independent o
 
 Fig. 3: 5 walkers with hop size = 0.01.
 
+All the milestones have been achieved. As shown above, we can have a desired amount of walkers each taking a desired amount of hops. Also, we implemented a function that computes the error and we can sample functions in 3D (specifically, an hydrogen atom). The results for the hydrogen atom are convincing. Figure 4 below shows the histogram of the sampled distribution and the expected plot for the hydrogen atom. The two overlap, demonstrating that the simulation works correctly. Also, the results for energy given by the [Integrate_3D](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L195-215) function are in accordance with the data present in the table from the book "Computational physics" by Jos Thijssen.
+
+![Hydrogen](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Figures/Hydrogen%20-%20Sampled%20vs%20expected.jpeg)
+
+Fig. 4: Histogram of sampled points for an Hydrogen atom and the expected distribution
+
 ## Week 3
 (due before 5 May)
 
