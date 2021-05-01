@@ -78,5 +78,12 @@ Fig. 5: Plot of energies for an Hydrogen atom for different variational parament
 
 ## Week 3
 (due before 5 May)
+Goals:
+
+    -mcmc function and integrate function must go from 3D to 6D
+    -Function psi^2 for helium
+    -calculate dE/da
+    -calculate expectation value of dE/da (eq. 12.13 in Jos' book)
+    -function that takes inputs: dE/da_old and a_old, and gives a new a_new (eq. 12.14)
 
 

@@ -212,7 +212,7 @@ def integrate_3D(func, funcparam, dist_x_, dist_y_, dist_z_):
     sampled = func(distrx,distry,distrz, *funcparam)
     integral = np.average(sampled)
     err = np.var(sampled)
-    return integral, err  
+    return integral, err
 
 
 #==========================================================#
