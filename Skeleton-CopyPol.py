@@ -241,7 +241,7 @@ def psi2_Helium(x1,y1,z1,x2,y2,z2, alpha):
     r_1 = np.sqrt(x1**2+y1**2+z1**2)
     r_2 = np.sqrt(x2**2+y2**2+z2**2)
     r_12 = abs(r_1 - r_2)
-    return (np.exp(-2*r_1))*(np.exp(-2*r_2))*(np.exp(r_12/(2+2*alpha*r_12)))
+    return (np.exp(-4*r_1))*(np.exp(-4*r_2))*(np.exp(r_12/(1+alpha*r_12)))
 
 def dlnpsida(x1,y1,z1,x2,y2,z2,alpha_):
     """Calculates the derivative of ln(psi_T) with respect to alpha.
@@ -272,7 +272,8 @@ def E_L_Hydrogen(x,y,z,alpha):
     r = np.sqrt(x**2+y**2+z**2)
     return -1/r-1/2*alpha*(alpha-2/r)
 
-def E_loc(x1,y1,z1,x2,y2,z2, alpha):
+
+def E_locold(x1,y1,z1,x2,y2,z2, alpha):
     """Computes the local energy 
     Units are normalized
     Parameters
@@ -288,13 +289,66 @@ def E_loc(x1,y1,z1,x2,y2,z2, alpha):
 """
     r_1 = np.array([x1, y1, z1])           #position vectors
     r_2 = np.array([x2, y2, z2])
+    r_1mag = np.linalg.norm(r_1)
+    r_2mag = np.linalg.norm(r_2)
+
+    r_12 = np.linalg.norm(r_1 - r_2)
+    
+    return -4 + (np.dot(r_1/r_1mag - r_2/r_2mag, r_1 - r_2)) * 1/(r_12*(1 + alpha*r_12)**2) - 1/(r_12*(1 + alpha*r_12)**3) - 1/(4*r_12*(1 + alpha*r_12)**4) + 1/r_12
+
+def E_locold2(x1,y1,z1,x2,y2,z2, alpha):
+    """Computes the local energy 
+    Units are normalized
+    Parameters
+    ----------
+    x1,y1,z1,x2,y2,z2:
+        Position of the two electrons in cartesian coordinates
+    alpha:
+        parameter of variation
+    Returns
+    -------
+    psi^2
+"""
+    r_1 = np.array([x1, y1, z1])           #position vectors
+    r_2 = np.array([x2, y2, z2])
     m_1 = np.sqrt(x1**2+y1**2+z1**2)       #modules of r_1 and r_2
     m_2 = np.sqrt(x2**2+y2**2+z2**2)
 
     r_12 = np.linalg.norm(r_1 - r_2)
     
-    return -4 + (((r_1/m_1 - r_2/m_2)*(r_1 - r_2)).sum(axis=0)) * 1/(r_12*(1 + alpha*r_12)**2) - 1/(r_12*(1 + alpha*r_12)**3) - 1/(4*r_12*(1 + alpha*r_12)**4) + 1/r_12
+    x_ = (x1/m_1 - x2/m_2)*(x1 - x2)
+    y_ = (y1/m_1 - y2/m_2)*(y1 - y2)
+    z_ = (z1/m_1 - z2/m_2)*(z1 - z2)
     
+    return -4 + (((r_1/m_1 - r_2/m_2)(r_1 - r_2)).sum(axis=1)) * 1/(r_12(1 + alpha*r_12)*2) - 1/(r_12(1 + alpha*r_12)*3) - 1/(4*r_12(1 + alpha*r_12)**4) + 1/r_12
+    #return -4 + (x_ + y_ + z_) * 1/(r_12*(1 + alpha*r_12)**2) - 1/(r_12*(1 + alpha*r_12)**3) - 1/(4*r_12*(1 + alpha*r_12)**4) + 1/r_12
+
+def E_loc(x1,y1,z1,x2,y2,z2, alpha):
+    """Computes the local energy 
+    Units are normalized
+    Parameters
+    ----------
+    x1,y1,z1,x2,y2,z2:
+        Position of the two electrons in cartesian coordinates
+    alpha:
+        parameter of variation
+    Returns
+    -------
+    psi^2
+"""
+    r_1 = np.array([x1, y1, z1])           #position vectors
+    r_2 = np.array([x2, y2, z2])
+    m_1 = np.sqrt(np.sum((r_1)**2, axis=0))       #modules of r_1 and r_2
+    m_2 = np.sqrt(np.sum((r_2)**2, axis=0))
+
+    r_12 = np.sqrt(np.sum((r_1 - r_2)**2, axis=0))
+    
+    x_ = (x1/m_1 - x2/m_2)*(x1 - x2)
+    y_ = (y1/m_1 - y2/m_2)*(y1 - y2)
+    z_ = (z1/m_1 - z2/m_2)*(z1 - z2)
+    
+    
+    return -4 + (x_ + y_ + z_) * 1/(r_12*(1 + alpha*r_12)**2) - 1/(r_12*(1 + alpha*r_12)**3) - 1/(4*r_12*(1 + alpha*r_12)**4) + 1/r_12
 
 # ==========================================================#
 #                       Integration                         #
