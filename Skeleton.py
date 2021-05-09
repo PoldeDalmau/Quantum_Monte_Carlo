@@ -19,7 +19,7 @@ def random_coin(p):
         return False
     else:
         return True
-    
+
 def mcmc_sample(hops,pdf, pdfparam):                 
     """
     Samples points for a given function with markov chain monte carlo (mcmc)
@@ -58,6 +58,74 @@ def mcmc_sample(hops,pdf, pdfparam):
             #print("accepted", i, "n_acc", n_accepted)
     #print ("accepted/total =", n_accepted/hops)
 
+def mcmc_sample_6D(hops,pdf, pdfparam):                 
+    """
+    Samples points for a given function with markov chain monte carlo (mcmc)
+    Parameters
+    ----------
+    pdf: function
+        function to be sampled
+    n_samples: int
+        number of sampled points
+    pdfparam: list
+        parameters that the pdf takes (if normal, standard deviation, mean...)    
+        
+    possible improvement: make number of walkers a controllable parameter.
+    """
+    states_x1 = []                                        #initialize lists for first electron
+    states_y1 = []
+    states_z1 = []
+    states_x2 = []                                       #initialize lists for second electron
+    states_y2 = []
+    states_z2 = []
+    n_accepted = 0
+    r_rp = np.zeros(hops)
+    rp_r = np.zeros(hops)
+    current_x1 = random.uniform(-4,4)                      # generates numbers around zero in a uniform way, only for the first position of the "walker"
+    current_y1 = random.uniform(-4,4)
+    current_z1 = random.uniform(-4,4)
+    current_x2 = random.uniform(-4,4)
+    current_y2 = random.uniform(-4,4)
+    current_z2 = random.uniform(-4,4)
+    for i in range(1,1+hops):                               # hops is the number of times you "hop", i.e. nr of steps...
+        states_x1.append(current_x1)
+        states_y1.append(current_y1)
+        states_z1.append(current_z1)
+        states_x2.append(current_x2)
+        states_y2.append(current_y2)
+        states_z2.append(current_z2)
+        movement_x1 = current_x1 + random.uniform(-hop_size,hop_size)
+        movement_y1 = current_y1 + random.uniform(-hop_size,hop_size)
+        movement_z1 = current_z1 + random.uniform(-hop_size,hop_size)
+        movement_x2 = current_x2 + random.uniform(-hop_size,hop_size)
+        movement_y2 = current_y2 + random.uniform(-hop_size,hop_size)
+        movement_z2 = current_z2 + random.uniform(-hop_size,hop_size)
+        if i % n_hopsperwalker == 0 and i!=1:
+            current_x1 = random.uniform(-4,4)
+            current_y1 = random.uniform(-4,4)
+            current_z1 = random.uniform(-4,4)
+            current_x2 = random.uniform(-4,4)
+            current_y2 = random.uniform(-4,4)
+            current_z2 = random.uniform(-4,4)
+        curr_prob = pdf(current_x1, current_y1, current_z1, current_x2, current_y2, current_z2, *pdfparam)
+        move_prob = pdf(movement_x1, movement_y1, movement_z1,  movement_x2, movement_y2, movement_z2, *pdfparam)       # same prob from 1 to 2 than from 2 to 1, easier in cartesian. Book by jos uses spherical -> would need some scaling 
+                                                        # to account for different volume in spherical shells of different radius. Probably it would be a factor r/r'
+        acceptance = min(move_prob/curr_prob,1)         # acceptance is A_RR'
+        invacceptance = min(curr_prob/move_prob,1)
+        r_rp[i-1] = acceptance * curr_prob
+        rp_r[i-1] = invacceptance * move_prob
+        if random_coin(acceptance) and i % n_hopsperwalker != 0:
+            current_x1 = movement_x1
+            current_y1 = movement_y1
+            current_z1 = movement_z1
+            current_x2 = movement_x2
+            current_y2 = movement_y2
+            current_z2 = movement_z2
+            n_accepted += 1
+            #print("accepted", i, "n_acc", n_accepted)
+    #print ("accepted/total =", n_accepted/hops)
+    return states_x1, states_y1, states_z1, states_x2, states_y2, states_z2, n_accepted/hops, r_rp, rp_r    
+    
 def mcmc_sample_3D(hops,pdf, pdfparam):                 
     """
     Samples points for a given function with markov chain monte carlo (mcmc)
@@ -157,9 +225,44 @@ def psi2_Harmonic(x, alpha):
     """
     return np.exp(-2*alpha*x**2)
 
+def psi2_Helium(x1,y1,z1,x2,y2,z2, alpha):
+    """Trial wavefunction for the Helium atom's ground state 
+    Units are normalized
+    Parameters
+    ----------
+    x1,y1,z1,x2,y2,z2:
+        Position of the two electrons in cartesian coordinates
+    alpha:
+        parameter of variation
+    Returns
+    -------
+    psi:
+"""
+    r_1 = np.sqrt(x1**2+y1**2+z1**2)
+    r_2 = np.sqrt(x2**2+y2**2+z2**2)
+    r_12 = abs(r_1 - r_2)
+    return (np.exp(-4*r_1))*(np.exp(-4*r_2))*(np.exp(r_12/(1+alpha*r_12)))
+
+def dlnpsida(x1,y1,z1,x2,y2,z2,alpha_):
+    """Calculates the derivative of ln(psi_T) with respect to alpha.
+     Parameters
+    ----------
+    x1,y1,z1, x2,y2,z2: float
+        positions in cartesian coordinates of electron 1 and 2 respectively.
+    alpha_: float
+        variational parameter
+    """
+    r_12 = np.sqrt((x1-x2)**2+(y1-y2)**2+(z1-z2)**2)
+    return -r_12**2/(r_12*alpha+1)**2
+
+
+
 # ==========================================================#
 #                     Observables/E_L                      #
 # ==========================================================#
+
+def one(x1,y1,z1,x2,y2,z2,alpha_):
+    return 1
 
 def E_L_Harmonic(x, alpha):
     return alpha + x**2*(1/2-2*alpha**2)
@@ -170,8 +273,85 @@ def E_L_Hydrogen(x,y,z,alpha):
     return -1/r-1/2*alpha*(alpha-2/r)
 
 
+def E_locold(x1,y1,z1,x2,y2,z2, alpha):
+    """Computes the local energy 
+    Units are normalized
+    Parameters
+    ----------
+    x1,y1,z1,x2,y2,z2:
+        Position of the two electrons in cartesian coordinates
+    alpha:
+        parameter of variation
+    Returns
+    -------
+    psi:
+        Can it be complex?
+"""
+    r_1 = np.array([x1, y1, z1])           #position vectors
+    r_2 = np.array([x2, y2, z2])
+    r_1mag = np.linalg.norm(r_1)
+    r_2mag = np.linalg.norm(r_2)
+
+    r_12 = np.linalg.norm(r_1 - r_2)
+    
+    return -4 + (np.dot(r_1/r_1mag - r_2/r_2mag, r_1 - r_2)) * 1/(r_12*(1 + alpha*r_12)**2) - 1/(r_12*(1 + alpha*r_12)**3) - 1/(4*r_12*(1 + alpha*r_12)**4) + 1/r_12
+
+def E_locold2(x1,y1,z1,x2,y2,z2, alpha):
+    """Computes the local energy 
+    Units are normalized
+    Parameters
+    ----------
+    x1,y1,z1,x2,y2,z2:
+        Position of the two electrons in cartesian coordinates
+    alpha:
+        parameter of variation
+    Returns
+    -------
+    psi^2
+"""
+    r_1 = np.array([x1, y1, z1])           #position vectors
+    r_2 = np.array([x2, y2, z2])
+    m_1 = np.sqrt(x1**2+y1**2+z1**2)       #modules of r_1 and r_2
+    m_2 = np.sqrt(x2**2+y2**2+z2**2)
+
+    r_12 = np.linalg.norm(r_1 - r_2)
+    
+    x_ = (x1/m_1 - x2/m_2)*(x1 - x2)
+    y_ = (y1/m_1 - y2/m_2)*(y1 - y2)
+    z_ = (z1/m_1 - z2/m_2)*(z1 - z2)
+    
+    return -4 + (((r_1/m_1 - r_2/m_2)(r_1 - r_2)).sum(axis=1)) * 1/(r_12(1 + alpha*r_12)*2) - 1/(r_12(1 + alpha*r_12)*3) - 1/(4*r_12(1 + alpha*r_12)**4) + 1/r_12
+    #return -4 + (x_ + y_ + z_) * 1/(r_12*(1 + alpha*r_12)**2) - 1/(r_12*(1 + alpha*r_12)**3) - 1/(4*r_12*(1 + alpha*r_12)**4) + 1/r_12
+
+def E_loc(x1,y1,z1,x2,y2,z2, alpha):
+    """Computes the local energy 
+    Units are normalized
+    Parameters
+    ----------
+    x1,y1,z1,x2,y2,z2:
+        Position of the two electrons in cartesian coordinates
+    alpha:
+        parameter of variation
+    Returns
+    -------
+    psi^2
+"""
+    r_1 = np.array([x1, y1, z1])           #position vectors
+    r_2 = np.array([x2, y2, z2])
+    m_1 = np.sqrt(np.sum((r_1)**2, axis=0))       #modules of r_1 and r_2
+    m_2 = np.sqrt(np.sum((r_2)**2, axis=0))
+
+    r_12 = np.sqrt(np.sum((r_1 - r_2)**2, axis=0))
+    
+    x_ = (x1/m_1 - x2/m_2)*(x1 - x2)
+    y_ = (y1/m_1 - y2/m_2)*(y1 - y2)
+    z_ = (z1/m_1 - z2/m_2)*(z1 - z2)
+    
+    
+    return -4 + (x_ + y_ + z_) * 1/(r_12*(1 + alpha*r_12)**2) - 1/(r_12*(1 + alpha*r_12)**3) - 1/(4*r_12*(1 + alpha*r_12)**4) + 1/r_12
+
 # ==========================================================#
-#                       Integration                        #
+#                       Integration                         #
 # ==========================================================#
 
 def integrate(func, funcparam, dist_):
@@ -214,10 +394,35 @@ def integrate_3D(func, funcparam, dist_x_, dist_y_, dist_z_):
     err = np.var(sampled)
     return integral, err
 
+def integrate_6D(func, funcparam, dist_x1_, dist_y1_, dist_z1_, dist_x2_, dist_y2_, dist_z2_):
+    """
+    Integrates a given function's product with the pdf from the mcmc_sample function
+    Parameters
+    ----------
+    pdff: function
+        this is the probability density function we want to use. (in this project it is always psi**2)
+    func: function
+        function we wish to find the expectation value of. (in this project this is E_L, the local energy)
+    param: float
+        parameter of probability density function (it will always be just alpha)
+    funcparam: list
+        list containing all parameters of the function (E_L) including alpha. May become just a float alpha in the future since E_L only has that parameter.
+    """
+    distrx1 = np.array(dist_x1_)
+    distry1 = np.array(dist_y1_)
+    distrz1 = np.array(dist_z1_)
+    distrx2 = np.array(dist_x2_)
+    distry2 = np.array(dist_y2_)
+    distrz2 = np.array(dist_z2_)
+    sampled = func(distrx1,distry1,distrz1,distrx2,distry2,distrz2, *funcparam)
+    integral = np.average(sampled)
+    err = np.var(sampled)
+    return integral, err
 
-#==========================================================#
+
+# ==========================================================#
 #                     Data Processing                      #
-#==========================================================#
+# ==========================================================#
 
 
 def plot_dist(x,y,z,dist_, n_bins, pdf, param):
@@ -239,7 +444,7 @@ def plot_dist(x,y,z,dist_, n_bins, pdf, param):
     plt.legend()
 
     plt.show()
-    
+
     
 
 def burn_in(states, n_removed = 4000):
@@ -267,3 +472,4 @@ def error(pdff, param):
         r = np.sum(R_shape, axis = 1)/b
         S_a[b]=np.sqrt((1/(Nb-1))*(((1/Nb)*np.sum(np.square(r)))-np.square((1/Nb)*np.sum(r))))
     return S_a
+
