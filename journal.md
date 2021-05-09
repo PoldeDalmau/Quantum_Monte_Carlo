@@ -78,12 +78,19 @@ Fig. 5: Plot of energies for an Hydrogen atom for different variational parament
 
 ## Week 3
 (due before 5 May)
-Goals:
 
-    -mcmc function and integrate function must go from 3D to 6D
-    -Function psi^2 for helium
-    -calculate dE/da
-    -calculate expectation value of dE/da (eq. 12.13 in Jos' book)
-    -function that takes inputs: dE/da_old and a_old, and gives a new a_new (eq. 12.14)
+Milestones:
+
+    - Pol: calculate dE/da, calculate expectation value of dE/da
+    - Alberto: mcmc function in 6D, function psi^2 for helium
+    - Matteo: integrate function in 6D, update value of alpha for minimization
+ 
+We updated the mcmc and the integrate functions to obtain the [mcmc_6D](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L61-127) and the [integrate_6D](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L397-420) functions, to work with the [He wavefunction](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L228-244) and the [local energy](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L228-244) to get results for the He ground state energy. The results, shown in figure 6 below, are in accordance with the data present in the table from the book "Computational physics" by Jos Thijssen. Generally, our values for the energy for different alphas are slightly more negative than those in the literature, but are still within the error bars.
 
 
+![Helium_comparison](Figures/Helium comparison.jpg)
+
+Fig. 6: Plot of energies for an Helium atom for different variational paramenters
+
+
+Finally, we tried to implement the minimization of the energy. To do so, we implemented a function to compute [$\frac{\mathrm{d}\ln{\psi_T}}{\mathrm{d}\alpha}$](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L246-256) and used the integrate_6D function to obtain the expectation values. Also, we updated alpha according to the given formula. The results are not great, as alpha barely changes and the same goes for the energy.
