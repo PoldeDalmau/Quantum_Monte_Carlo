@@ -273,56 +273,6 @@ def E_L_Hydrogen(x,y,z,alpha):
     return -1/r-1/2*alpha*(alpha-2/r)
 
 
-def E_locold(x1,y1,z1,x2,y2,z2, alpha):
-    """Computes the local energy 
-    Units are normalized
-    Parameters
-    ----------
-    x1,y1,z1,x2,y2,z2:
-        Position of the two electrons in cartesian coordinates
-    alpha:
-        parameter of variation
-    Returns
-    -------
-    psi:
-        Can it be complex?
-"""
-    r_1 = np.array([x1, y1, z1])           #position vectors
-    r_2 = np.array([x2, y2, z2])
-    r_1mag = np.linalg.norm(r_1)
-    r_2mag = np.linalg.norm(r_2)
-
-    r_12 = np.linalg.norm(r_1 - r_2)
-    
-    return -4 + (np.dot(r_1/r_1mag - r_2/r_2mag, r_1 - r_2)) * 1/(r_12*(1 + alpha*r_12)**2) - 1/(r_12*(1 + alpha*r_12)**3) - 1/(4*r_12*(1 + alpha*r_12)**4) + 1/r_12
-
-def E_locold2(x1,y1,z1,x2,y2,z2, alpha):
-    """Computes the local energy 
-    Units are normalized
-    Parameters
-    ----------
-    x1,y1,z1,x2,y2,z2:
-        Position of the two electrons in cartesian coordinates
-    alpha:
-        parameter of variation
-    Returns
-    -------
-    psi^2
-"""
-    r_1 = np.array([x1, y1, z1])           #position vectors
-    r_2 = np.array([x2, y2, z2])
-    m_1 = np.sqrt(x1**2+y1**2+z1**2)       #modules of r_1 and r_2
-    m_2 = np.sqrt(x2**2+y2**2+z2**2)
-
-    r_12 = np.linalg.norm(r_1 - r_2)
-    
-    x_ = (x1/m_1 - x2/m_2)*(x1 - x2)
-    y_ = (y1/m_1 - y2/m_2)*(y1 - y2)
-    z_ = (z1/m_1 - z2/m_2)*(z1 - z2)
-    
-    return -4 + (((r_1/m_1 - r_2/m_2)(r_1 - r_2)).sum(axis=1)) * 1/(r_12(1 + alpha*r_12)*2) - 1/(r_12(1 + alpha*r_12)*3) - 1/(4*r_12(1 + alpha*r_12)**4) + 1/r_12
-    #return -4 + (x_ + y_ + z_) * 1/(r_12*(1 + alpha*r_12)**2) - 1/(r_12*(1 + alpha*r_12)**3) - 1/(4*r_12*(1 + alpha*r_12)**4) + 1/r_12
-
 def E_loc(x1,y1,z1,x2,y2,z2, alpha):
     """Computes the local energy 
     Units are normalized
@@ -426,6 +376,9 @@ def integrate_6D(func, funcparam, dist_x1_, dist_y1_, dist_z1_, dist_x2_, dist_y
 
 
 def plot_dist(x,y,z,dist_, n_bins, pdf, param):
+    """
+    Prints the histogram and the expected plot for the input distribution
+    """
     
     #normalization = np.sqrt(np.pi * param * 2)
     #x = np.linspace(0,3.5, 100)
