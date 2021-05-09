@@ -93,4 +93,8 @@ We updated the mcmc and the integrate functions to obtain the [mcmc_6D](https://
 Fig. 6: Plot of energies for an Helium atom for different variational paramenters
 
 
-Finally, we tried to implement the minimization of the energy. To do so, we implemented a function to compute [$\frac{\mathrm{d}\ln{\psi_T}}{\mathrm{d}\alpha}$](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L246-256) and used the integrate_6D function to obtain the expectation values. Also, we updated alpha according to the given formula. The results are not great, as alpha barely changes and the same goes for the energy.
+Finally, we tried to implement the minimization of the energy. To do so, we implemented a function to compute [$`\frac{\mathrm{d}\ln{\psi_T}}{\mathrm{d}\alpha}`$](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L246-256) and used the integrate_6D function to obtain the expectation values. Also, we updated alpha according to the given formula. The results are not great, as alpha barely changes and the same goes for the energy.
+
+In the minimization, we found no minimum. The parameter alpha seems to increase while the energy doesn't get minimized but remains constant. ![minimization](Figures/Alpha_errbar.JPG).
+
+Fig. 7: Each time, 4 walkers taking 4000 steps are used to compute the energy and its error. Each alpha is larger than the former.  In other words, $`\frac{\mathrm{d}E}{\mathrm{d}\alpha}`$ is always negative increasing alpha after each iteration.
