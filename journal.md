@@ -98,3 +98,9 @@ Finally, we tried to implement the minimization of the energy. To do so, we impl
 In the minimization, we found no minimum. The parameter alpha seems to increase while the energy doesn't get minimized but remains constant. ![minimization](Figures/Alpha_errbar.JPG).
 
 Fig. 7: Each time, 4 walkers taking 4000 steps are used to compute the energy and its error. Each alpha is larger than the former.  In other words, $`\frac{\mathrm{d}E}{\mathrm{d}\alpha}`$ is always negative increasing alpha after each iteration.
+
+Finally, we calculated the error in the energy with datablocking as we did for the first project. We see that after little more than 50 steps the energy is less and less correlated. A problem we encounter is that the error is far too small and depends on the number of sampled points. The more points we take the smaller it becomes. We are confident the code is correct since it worked in Project 1 so we would appreciate help on this.
+
+ ![datablocking](Figures/Error_from_datablocking.JPG)
+
+Fig. 8: Error in the energy computed by data blocking.
