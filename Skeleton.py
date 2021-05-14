@@ -238,10 +238,13 @@ def psi2_Helium(x1,y1,z1,x2,y2,z2, alpha):
     -------
     psi:
 """
-    r_1 = np.sqrt(x1**2+y1**2+z1**2)
-    r_2 = np.sqrt(x2**2+y2**2+z2**2)
-    r_12 = abs(r_1 - r_2)
-    return (np.exp(-4*r_1))*(np.exp(-4*r_2))*(np.exp(r_12/(1+alpha*r_12)))
+    r_1 = np.array([x1, y1, z1])           #position vectors
+    r_2 = np.array([x2, y2, z2])
+    m_1 = np.sqrt(np.sum((r_1)**2, axis=0))       #modules of r_1 and r_2
+    m_2 = np.sqrt(np.sum((r_2)**2, axis=0))
+    r_12 = np.sqrt(np.sum((r_1 - r_2)**2, axis=0))
+
+    return (np.exp(-4*m_1))*(np.exp(-4*m_2))*(np.exp(r_12/(1+alpha*r_12)))
 
 def dlnpsida(x1,y1,z1,x2,y2,z2,alpha_):
     """Calculates the derivative of ln(psi_T) with respect to alpha.
@@ -252,8 +255,16 @@ def dlnpsida(x1,y1,z1,x2,y2,z2,alpha_):
     alpha_: float
         variational parameter
     """
-    r_12 = np.sqrt((x1-x2)**2+(y1-y2)**2+(z1-z2)**2)
-    return -r_12**2/(r_12*alpha+1)**2
+    r_1 = np.array([x1, y1, z1])           #position vectors
+    r_2 = np.array([x2, y2, z2])
+    r_12 = np.sqrt(np.sum((r_1 - r_2)**2, axis=0))
+    
+
+    return -r_12**2/(2*(r_12*alpha+1)**2)
+
+#def dlnpsidahydrogen(x,y,z,alpha_):
+    #constant! = -alpha
+    
 
 
 
@@ -272,6 +283,12 @@ def E_L_Hydrogen(x,y,z,alpha):
     r = np.sqrt(x**2+y**2+z**2)
     return -1/r-1/2*alpha*(alpha-2/r)
 
+def E_L_Hydrogentimesr(x,y,z,alpha):
+    r = np.sqrt(x**2+y**2+z**2)
+    return 1+r/2*alpha*(alpha-2/r)
+
+def negativer(x,y,z,alpha):
+    return -np.sqrt(x**2+y**2+z**2)
 
 def E_loc(x1,y1,z1,x2,y2,z2, alpha):
     """Computes the local energy 
@@ -299,6 +316,13 @@ def E_loc(x1,y1,z1,x2,y2,z2, alpha):
     
     
     return -4 + (x_ + y_ + z_) * 1/(r_12*(1 + alpha*r_12)**2) - 1/(r_12*(1 + alpha*r_12)**3) - 1/(4*r_12*(1 + alpha*r_12)**4) + 1/r_12
+
+def E_loc_dlpsida(x1,y1,z1,x2,y2,z2, alpha):
+    
+    E = E_loc(x1,y1,z1,x2,y2,z2, alpha)
+    der = dlnpsida(x1,y1,z1,x2,y2,z2,alpha)
+    
+    return E*der
 
 # ==========================================================#
 #                       Integration                         #
@@ -380,14 +404,15 @@ def plot_dist(x,y,z,dist_, n_bins, pdf, param):
     Prints the histogram and the expected plot for the input distribution
     """
     
-    #normalization = np.sqrt(np.pi * param * 2)
+    normalization = 6.521703418100389
     #x = np.linspace(0,3.5, 100)
     #y = np.linspace(0,3.5, 100)
     #z = np.linspace(0,3.5, 100)
-    f = pdf(x, y, z, param)#/normalization
+    f = pdf(x, y, z, param)*normalization
     r = np.linspace(0,10, 500)
-    f2= 4*np.pi/(np.pi/(2.4))**(3/2)*r**2*pdf(r,0,0,param)
-    plt.title("Histogram of sampled points")
+    f2= r**2*pdf(r,0,0,param)*normalization
+    figu = plt.figure()
+    plt.title("Histogram of sampled points for Hydrogen atom")
     #plt.scatter(np.sqrt(x**2+y**2+z**2),f, c = "r", label = "expected distribution")
     plt.plot(r, f2, label = "expected distribution", c = "r")
     plt.ylabel("Counts")
@@ -397,7 +422,7 @@ def plot_dist(x,y,z,dist_, n_bins, pdf, param):
     plt.legend()
 
     plt.show()
-
+    figu.savefig("Hydrogen - Sampled vs expected.pdf", bbox_inches='tight')
     
 
 def burn_in(states, n_removed = 4000):
