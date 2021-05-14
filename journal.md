@@ -88,18 +88,18 @@ Milestones:
 We updated the mcmc and the integrate functions to obtain the [mcmc_6D](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L61-127) and the [integrate_6D](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L397-420) functions, to work with the [He wavefunction](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L228-244) and the [local energy](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L228-244) to get results for the He ground state energy. The results, shown in figure 6 below, are in accordance with the data present in the table from the book "Computational physics" by Jos Thijssen. Generally, our values for the energy for different alphas are slightly more negative than those in the literature, but are still within the error bars.
 
 
-![Helium_comparison](Figures/Helium comparison.jpg)
+![Helium_comparison](Figures/Helium_comparisonjpeg.JPG)
 
-Fig. 6: Plot of energies for an Helium atom for different variational paramenters
+Fig. 6: Plot of energies for an Helium atom for different values of the variational parameter alpha.
 
 
-Finally, we tried to implement the minimization of the energy. To do so, we implemented a function to compute [$`\frac{\mathrm{d}\ln{\psi_T}}{\mathrm{d}\alpha}`$](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L246-256) and used the integrate_6D function to obtain the expectation values. Also, we updated alpha according to the given formula. The results are not great, as alpha barely changes and the same goes for the energy.
+Finally, we tried to implement the minimization of the energy. To do so, we implemented a function to compute [$`\frac{\mathrm{d}\ln{\psi_T}}{\mathrm{d}\alpha}`$](https://gitlab.kwant-project.org/computational_physics/projects/Project-2---QMC_pdedalmauhugue/-/blob/master/Skeleton.py#L246-256) and used the integrate_6D function to obtain the expectation values. Also, we updated alpha according to the given formula. The results are as expected, the parameter alpha converges.
 
-In the minimization, we found no minimum. The parameter alpha seems to increase while the energy doesn't get minimized but remains constant. ![minimization](Figures/Alpha_errbar.JPG).
+![Helium_minimization](Figures/Helium_minimizationjpg.JPG)
 
-Fig. 7: Each time, 4 walkers taking 4000 steps are used to compute the energy and its error. Each alpha is larger than the former.  In other words, $`\frac{\mathrm{d}E}{\mathrm{d}\alpha}`$ is always negative increasing alpha after each iteration.
+Fig 7: Minimization of the energy by tuning the parameter alpha. It converges near the point alpha = 0.20942568335742295. The iteration is repeated until the derivative of the energy with respect to alpha reaches a value below 0.001. The energy corresponding to this is around -2.89 a.u. which is in very good agreement with the literature value -2.9037243771 a.u.
 
-Finally, we calculated the error in the energy with datablocking as we did for the first project. We see that after little more than 50 steps the energy is less and less correlated. A problem we encounter is that the error is far too small and depends on the number of sampled points. The more points we take the smaller it becomes. We are confident the code is correct since it worked in Project 1 so we would appreciate help on this.
+Finally, we calculated the error in the energy with datablocking as we did for the first project. We see that after little more than 50 steps the energy is less and less correlated. A problem we encounter is that the error is far too small and depends on the number of sampled points. The more points we take the smaller it becomes (for a few million points the error was reduced by a factor 10). We are confident the code is correct since it worked in Project 1 so we would appreciate help on this. We do not discard the possibility that the error is in fact this small.
 
  ![datablocking](Figures/Error_from_datablocking.JPG)
 
