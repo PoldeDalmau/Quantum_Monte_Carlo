@@ -210,7 +210,7 @@ def dlnpsida(x1,y1,z1,x2,y2,z2,alpha_):
     r_12 = np.sqrt(np.sum((r_1 - r_2)**2, axis=0))
     
 
-    return -r_12**2/(2*(r_12*alpha+1)**2)
+    return -r_12**2/(2*(r_12*alpha_+1)**2)
 
     
 
