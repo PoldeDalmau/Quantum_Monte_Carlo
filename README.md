@@ -12,7 +12,8 @@ In the second cell, the following parameters are of interest to the user:
     -n_hopsperwalker (type:int): number of steps taken by each walker.
     -remove (type:int): number of steps removed from each walker for ewquilibration
     -hop_size (type: float): maximum distance a single step by a walker can be in a given cartesian coordinate x,y,z. Is to be set in order to get an acceptance ratio of about 0.5.
-    -maxdEda (type: float): minimization won't stop until the derivative of energy is smaller than this number. This number couldn't be made smaller than 0.001. No convergence occurred within reasonable times. 
+    -maxdEda (type: float): minimization won't stop until the derivative of energy is smaller than this number. This number couldn't be made smaller than 0.001. No convergence occurred within reasonable times.
+    -alpha(type: float): initial value chosen for alpha.
     -g (type: float): damping factor in steepest descent method when computing the optimal alpha. To obtain a very accurate value of alpha, we set it to 0.1. However, in this case the initial alpha must already be close to the correct one. Otherwise no convergence will occur in a reasonable amount of time.
     -onlyoneiteration (type: bool): If set to True, no minimization will take place. This will only calculate the energy, variance and datablocking error. If set to False, the minimization will go on until the condition imposed by maxdEda is satisfied. 
     

@@ -40,22 +40,22 @@ def mcmc_sample_6D(hops,pdf, pdfparam):
     r_rp, rp_r: list
         p(R)A_RR′ and p(R')AR'R. These are later needed to check detailed balance    
     """
-    states_x1 = []                                        #initialize lists for first electron
+    states_x1 = []
     states_y1 = []
     states_z1 = []
-    states_x2 = []                                       #initialize lists for second electron
+    states_x2 = []
     states_y2 = []
     states_z2 = []
     n_accepted = 0
     r_rp = np.zeros(hops)
     rp_r = np.zeros(hops)
-    current_x1 = random.uniform(-4,4)                      # generates numbers around zero in a uniform way, only for the first position of the "walker"
+    current_x1 = random.uniform(-4,4)
     current_y1 = random.uniform(-4,4)
     current_z1 = random.uniform(-4,4)
     current_x2 = random.uniform(-4,4)
     current_y2 = random.uniform(-4,4)
     current_z2 = random.uniform(-4,4)
-    for i in range(1,1+hops):                               # hops is the number of times you "hop", i.e. nr of steps...
+    for i in range(1,1+hops):
         states_x1.append(current_x1)
         states_y1.append(current_y1)
         states_z1.append(current_z1)
@@ -76,9 +76,8 @@ def mcmc_sample_6D(hops,pdf, pdfparam):
             current_y2 = random.uniform(-4,4)
             current_z2 = random.uniform(-4,4)
         curr_prob = pdf(current_x1, current_y1, current_z1, current_x2, current_y2, current_z2, *pdfparam)
-        move_prob = pdf(movement_x1, movement_y1, movement_z1,  movement_x2, movement_y2, movement_z2, *pdfparam)       # same prob from 1 to 2 than from 2 to 1, easier in cartesian. Book by jos uses spherical -> would need some scaling 
-                                                        # to account for different volume in spherical shells of different radius. Probably it would be a factor r/r'
-        acceptance = min(move_prob/curr_prob,1)         # acceptance is A_RR'
+        move_prob = pdf(movement_x1, movement_y1, movement_z1,  movement_x2, movement_y2, movement_z2, *pdfparam)       
+        acceptance = min(move_prob/curr_prob,1)
         invacceptance = min(curr_prob/move_prob,1)
         r_rp[i-1] = acceptance * curr_prob
         rp_r[i-1] = invacceptance * move_prob
@@ -90,8 +89,6 @@ def mcmc_sample_6D(hops,pdf, pdfparam):
             current_y2 = movement_y2
             current_z2 = movement_z2
             n_accepted += 1
-            #print("accepted", i, "n_acc", n_accepted)
-    #print ("accepted/total =", n_accepted/hops)
     return states_x1, states_y1, states_z1, states_x2, states_y2, states_z2, n_accepted/hops, r_rp, rp_r    
     
 def mcmc_sample_3D(hops,pdf, pdfparam):                 
@@ -123,7 +120,7 @@ def mcmc_sample_3D(hops,pdf, pdfparam):
     current_x = random.uniform(-4,4)                      # generates numbers around zero in a uniform way, only for the first position of the "walker"
     current_y = random.uniform(-4,4)
     current_z = random.uniform(-4,4)
-    for i in range(1,1+hops):                               # hops is the number of times you "hop", i.e. nr of steps...
+    for i in range(1,1+hops):
         states_x.append(current_x)
         states_y.append(current_y)
         states_z.append(current_z)
@@ -135,9 +132,9 @@ def mcmc_sample_3D(hops,pdf, pdfparam):
             current_y = random.uniform(-4,4)
             current_z = random.uniform(-4,4)
         curr_prob = pdf(current_x, current_y, current_z, *pdfparam)
-        move_prob = pdf(movement_x, movement_y, movement_z,  *pdfparam)       # same prob from 1 to 2 than from 2 to 1, easier in cartesian. Book by jos uses spherical -> would need some scaling 
-                                                        # to account for different volume in spherical shells of different radius. Probably it would be a factor r/r'
-        acceptance = min(move_prob/curr_prob,1)         # acceptance is A_RR'
+        move_prob = pdf(movement_x, movement_y, movement_z,  *pdfparam)       
+                                                        
+        acceptance = min(move_prob/curr_prob,1)         
         invacceptance = min(curr_prob/move_prob,1)
         r_rp[i-1] = acceptance * curr_prob
         rp_r[i-1] = invacceptance * move_prob
@@ -148,7 +145,7 @@ def mcmc_sample_3D(hops,pdf, pdfparam):
             n_accepted += 1
             #print("accepted", i, "n_acc", n_accepted)
     #print ("accepted/total =", n_accepted/hops)
-    return states_x, states_y, states_z, n_accepted/hops, r_rp, rp_r                            # give the system some time to find a reasonable starting point. 
+    return states_x, states_y, states_z, n_accepted/hops, r_rp, rp_r
 
 
 
@@ -447,6 +444,5 @@ def error(energies, num):
         P_shape=np.reshape(P, (Nb,b))
         P = np.copy(energies)
         p = np.sum(P_shape, axis = 1)/b
-        S_a[b]=np.sqrt((1/(Nb-1))*(((1/Nb)*np.sum(np.square(p)))-np.square((1/Nb)*np.sum(p))))        #S_a[b]=np.sqrt((1/(Nb-1))*((1/b*np.sum(np.square(p)))-1/b**2*(np.sum(np.sum(p))**2)))
+        S_a[b]=np.sqrt((1/(Nb-1))*(((1/Nb)*np.sum(np.square(p)))-np.square((1/Nb)*np.sum(p))))
     return S_a
-
