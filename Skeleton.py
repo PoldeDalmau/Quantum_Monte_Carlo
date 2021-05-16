@@ -20,44 +20,6 @@ def random_coin(p):
     else:
         return True
 
-def mcmc_sample(hops,pdf, pdfparam):                 
-    """
-    Samples points for a given function with markov chain monte carlo (mcmc)
-    Parameters
-    ----------
-    pdf: function
-        function to be sampled
-    n_samples: int
-        number of sampled points
-    pdfparam: list
-        parameters that the pdf takes (if normal, standard deviation, mean...)    
-        
-    possible improvement: make number of walkers a controllable parameter.
-    """
-    states = []
-    n_accepted = 0
-    r_rp = np.zeros(hops)
-    rp_r = np.zeros(hops)
-    current = random.uniform(-4,4)
-    for i in range(1,1+hops):                               # hops is the number of times you "hop", i.e. nr of steps...
-        states.append(current)
-        movement = current + random.uniform(-hop_size,hop_size)
-        if i % n_hopsperwalker == 0 and i != 1:
-            current = random.uniform(-4,4)
-        curr_prob = pdf(current, *pdfparam)
-        move_prob = pdf(movement, *pdfparam)            # same prob from 1 to 2 than from 2 to 1, easier in cartesian. Book by jos uses spherical -> would need some scaling 
-                                                        # to account for different volume in spherical shells of different radius. Probably it would be a factor r/r'
-        
-        acceptance = min(move_prob/curr_prob,1)         # acceptance is A_RR'
-        invacceptance = min(curr_prob/move_prob,1)
-        r_rp[i-1] = acceptance * curr_prob
-        rp_r[i-1] = invacceptance * move_prob
-        if random_coin(acceptance) and i % n_hopsperwalker != 0:
-            current = movement
-            n_accepted += 1
-            #print("accepted", i, "n_acc", n_accepted)
-    #print ("accepted/total =", n_accepted/hops)
-
 def mcmc_sample_6D(hops,pdf, pdfparam):                 
     """
     Samples points for a given function with markov chain monte carlo (mcmc)
@@ -65,12 +27,18 @@ def mcmc_sample_6D(hops,pdf, pdfparam):
     ----------
     pdf: function
         function to be sampled
-    n_samples: int
+    hops: int
         number of sampled points
     pdfparam: list
-        parameters that the pdf takes (if normal, standard deviation, mean...)    
-        
-    possible improvement: make number of walkers a controllable parameter.
+        parameters that the pdf takes (if normal, standard deviation, mean...)
+    Returns
+    -------
+    states_x1, states_y1, states_z1, states_x2, states_y2, states_z2: list
+        sampled positions in cartesian coordinates
+    n_accepted/hops: float
+        acceptance ratio
+    r_rp, rp_r: list
+        p(R)A_RR′ and p(R')AR'R. These are later needed to check detailed balance    
     """
     states_x1 = []                                        #initialize lists for first electron
     states_y1 = []
@@ -133,12 +101,18 @@ def mcmc_sample_3D(hops,pdf, pdfparam):
     ----------
     pdf: function
         function to be sampled
-    n_samples: int
+    hops: int
         number of sampled points
     pdfparam: list
-        parameters that the pdf takes (if normal, standard deviation, mean...)    
-        
-    possible improvement: make number of walkers a controllable parameter.
+        parameters that the pdf takes (if normal, standard deviation, mean...)
+    Returns
+    -------
+    states_x, states_y, states_z: list
+        sampled positions in cartesian coordinates
+    n_accepted/hops: float
+        acceptance ratio
+    r_rp, rp_r: list
+        p(R)A_RR′ and p(R')AR'R. These are later needed to check detailed balance
     """
     states_x = []
     states_y = []
@@ -182,48 +156,23 @@ def mcmc_sample_3D(hops,pdf, pdfparam):
 #                    Wavefunctions/PDFs:                   #
 # ==========================================================#
 
-def normal(x,mu,sigma):                                
-    #numerator = 1/sigma*np.exp(-abs(x* sigma))
-    numerator = np.exp((-(x-mu)**2)/(2*sigma))
-    #denominator = np.sqrt(2*np.pi*sigma)               #aka normalization constant, not needed when distribution is used for sampling
-    return numerator#/denominator
-
-def function(x):                                
-    numerator = x**2
-    return numerator
-
 def psi_Hydrogen(x,y,z, alpha):
-    """Trial wavefunction for the Hydrogen atom's ground state 
-    (in this case the trial wavefunction will be the exact wavefunction)
+    """
+    Trial wavefunction for the Hydrogen atom's ground state.    
     Units are normalized
     Parameters
     ----------
-    r:
-        position r in spherical coordinates
-    alpha:
+    lists: x, y, z
+        positions in cartesian coordinates
+    float: alpha
         parameter of variation
     Returns
     -------
-    psi:
-        Can it be complex?
+    list: |psi|^2
 """
     r = np.sqrt(x**2+y**2+z**2)
     return np.exp(-2*alpha*r)
 
-def psi2_Harmonic(x, alpha):
-    """Trial wavefunction squared for the Hydrogen atom's ground state 
-    Units are normalized
-    Parameters
-    ----------
-    r:
-        position r in spherical coordinates
-    alpha:
-        parameter of variation
-    Returns
-    -------
-    psi**2 for a harmonic oscillator
-    """
-    return np.exp(-2*alpha*x**2)
 
 def psi2_Helium(x1,y1,z1,x2,y2,z2, alpha):
     """Trial wavefunction for the Helium atom's ground state 
@@ -236,7 +185,7 @@ def psi2_Helium(x1,y1,z1,x2,y2,z2, alpha):
         parameter of variation
     Returns
     -------
-    psi:
+    list: |psi|^2
 """
     r_1 = np.array([x1, y1, z1])           #position vectors
     r_2 = np.array([x2, y2, z2])
@@ -254,6 +203,10 @@ def dlnpsida(x1,y1,z1,x2,y2,z2,alpha_):
         positions in cartesian coordinates of electron 1 and 2 respectively.
     alpha_: float
         variational parameter
+        
+    Returns
+    -------
+        derivative of ln(psi_T) with respect to alpha: list
     """
     r_1 = np.array([x1, y1, z1])           #position vectors
     r_2 = np.array([x2, y2, z2])
@@ -262,8 +215,6 @@ def dlnpsida(x1,y1,z1,x2,y2,z2,alpha_):
 
     return -r_12**2/(2*(r_12*alpha+1)**2)
 
-#def dlnpsidahydrogen(x,y,z,alpha_):
-    #constant! = -alpha
     
 
 
@@ -272,26 +223,61 @@ def dlnpsida(x1,y1,z1,x2,y2,z2,alpha_):
 #                     Observables/E_L                      #
 # ==========================================================#
 
-def one(x1,y1,z1,x2,y2,z2,alpha_):
-    return 1
-
-def E_L_Harmonic(x, alpha):
-    return alpha + x**2*(1/2-2*alpha**2)
 
 def E_L_Hydrogen(x,y,z,alpha):
-    """Local energy function"""
+    """Local energy function
+    
+    Units are normalized
+    Parameters
+    ----------
+    lists: x, y, z
+        positions in cartesian coordinates
+    float: alpha
+        parameter of variation
+    Returns
+    -------
+    list: local energy for hydrogen
+    """
     r = np.sqrt(x**2+y**2+z**2)
     return -1/r-1/2*alpha*(alpha-2/r)
 
 def E_L_Hydrogentimesr(x,y,z,alpha):
+    """
+    Product of local energy with negative r. Needed when computing the derivative of the energy with respect to alpha.
+    
+    Units are normalized
+    Parameters
+    ----------
+    lists: x, y, z
+        positions in cartesian coordinates
+    float: alpha
+        parameter of variation
+    Returns
+    -------
+    Product of local energy with negative r: list
+    """
     r = np.sqrt(x**2+y**2+z**2)
     return 1+r/2*alpha*(alpha-2/r)
 
 def negativer(x,y,z,alpha):
+    """
+    Calculates -r. 
+    Needed when computing the derivative of the energy with respect to alpha.
+    
+    Units are normalized
+    Parameters
+    ----------
+    lists: x, y, z
+        positions in cartesian coordinates
+    float: alpha
+        parameter of variation
+    Returns
+    -------
+   negative r: list"""
     return -np.sqrt(x**2+y**2+z**2)
 
 def E_loc(x1,y1,z1,x2,y2,z2, alpha):
-    """Computes the local energy 
+    """Computes the local energy for the Helium Atom.
     Units are normalized
     Parameters
     ----------
@@ -301,8 +287,8 @@ def E_loc(x1,y1,z1,x2,y2,z2, alpha):
         parameter of variation
     Returns
     -------
-    psi^2
-"""
+    Local energy of Helium: list
+    """
     r_1 = np.array([x1, y1, z1])           #position vectors
     r_2 = np.array([x2, y2, z2])
     m_1 = np.sqrt(np.sum((r_1)**2, axis=0))       #modules of r_1 and r_2
@@ -318,6 +304,21 @@ def E_loc(x1,y1,z1,x2,y2,z2, alpha):
     return -4 + (x_ + y_ + z_) * 1/(r_12*(1 + alpha*r_12)**2) - 1/(r_12*(1 + alpha*r_12)**3) - 1/(4*r_12*(1 + alpha*r_12)**4) + 1/r_12
 
 def E_loc_dlpsida(x1,y1,z1,x2,y2,z2, alpha):
+    """
+    Product of local energy with the derivative of lnpsi with respect to alpha.
+    Needed when computing the derivative of the energy with respect to alpha.
+    
+    Units are normalized
+    Parameters
+    ----------
+    lists: x1,y1,z1,x2,y2,z2
+        positions in cartesian coordinates
+    float: alpha
+        parameter of variation
+    Returns
+    -------
+    Product of local energy with the derivative of lnpsi with respect to alpha
+    """
     
     E = E_loc(x1,y1,z1,x2,y2,z2, alpha)
     der = dlnpsida(x1,y1,z1,x2,y2,z2,alpha)
@@ -334,31 +335,41 @@ def integrate(func, funcparam, dist_):
     Parameters
     ----------
     func: function
-        function we wish to find the expectation value of. (in this project this is E_L, the local energy)
+        function we wish to find the expectation value of. (in this project this is mostly the local energy)
     param: float
         parameter of probability density function (it will always be just alpha)
     funcparam: list
-        list containing all parameters of the function (E_L) including alpha. May become just a float alpha in the future since E_L only has that parameter.
+        list containing all parameters of the function (E_L) including alpha.
+    Returns:
+    -------
+    integral: float
+        value of integral
+    err: float
+        variance in the energy
     """
     distr = np.array(dist_)
     sampled = func(distr, *funcparam)
     integral = np.average(sampled)
     err = np.var(sampled)
-    return integral, err  
+    return integral, err
 
 def integrate_3D(func, funcparam, dist_x_, dist_y_, dist_z_):
     """
     Integrates a given function's product with the pdf from the mcmc_sample function
     Parameters
     ----------
-    pdff: function
-        this is the probability density function we want to use. (in this project it is always psi**2)
     func: function
         function we wish to find the expectation value of. (in this project this is E_L, the local energy)
-    param: float
-        parameter of probability density function (it will always be just alpha)
     funcparam: list
-        list containing all parameters of the function (E_L) including alpha. May become just a float alpha in the future since E_L only has that parameter.
+        list containing all parameters of the function (E_L) including alpha.
+    dist_x_, dist_y_, dist_z_: list
+        sampled distributions in cartesian coordinates
+     Returns
+     -------
+    integral: float
+        value of integral
+    err: float
+        variance in the energy
     """
     distrx = np.array(dist_x_)
     distry = np.array(dist_y_)
@@ -373,14 +384,18 @@ def integrate_6D(func, funcparam, dist_x1_, dist_y1_, dist_z1_, dist_x2_, dist_y
     Integrates a given function's product with the pdf from the mcmc_sample function
     Parameters
     ----------
-    pdff: function
-        this is the probability density function we want to use. (in this project it is always psi**2)
     func: function
         function we wish to find the expectation value of. (in this project this is E_L, the local energy)
-    param: float
-        parameter of probability density function (it will always be just alpha)
     funcparam: list
         list containing all parameters of the function (E_L) including alpha. May become just a float alpha in the future since E_L only has that parameter.
+    dist_x1_, dist_y1_, dist_z1_, dist_x2_, dist_y2_, dist_z2_: list
+        sampled distributions in cartesian coordinates
+    Returns
+    -------
+    integral: float
+        value of integral
+    err: float
+        variance in the energy
     """
     distrx1 = np.array(dist_x1_)
     distry1 = np.array(dist_y1_)
@@ -398,56 +413,40 @@ def integrate_6D(func, funcparam, dist_x1_, dist_y1_, dist_z1_, dist_x2_, dist_y
 #                     Data Processing                      #
 # ==========================================================#
 
-
-def plot_dist(x,y,z,dist_, n_bins, pdf, param):
-    """
-    Prints the histogram and the expected plot for the input distribution
-    """
-    
-    normalization = 6.521703418100389
-    #x = np.linspace(0,3.5, 100)
-    #y = np.linspace(0,3.5, 100)
-    #z = np.linspace(0,3.5, 100)
-    f = pdf(x, y, z, param)*normalization
-    r = np.linspace(0,10, 500)
-    f2= r**2*pdf(r,0,0,param)*normalization
-    figu = plt.figure()
-    plt.title("Histogram of sampled points for Hydrogen atom")
-    #plt.scatter(np.sqrt(x**2+y**2+z**2),f, c = "r", label = "expected distribution")
-    plt.plot(r, f2, label = "expected distribution", c = "r")
-    plt.ylabel("Counts")
-    plt.xlabel("r")
-
-    plt.hist( dist_, density=True, bins=n_bins, label = "Sampled data")
-    plt.legend()
-
-    plt.show()
-    figu.savefig("Hydrogen - Sampled vs expected.pdf", bbox_inches='tight')
-    
-
 def burn_in(states, n_removed = 4000):
     """
-    removes first n_removed points of each walker's steps to ensure the final data to be equilibrated
+    removes first n_removed points of each walker's steps to ensure the final data to be equilibrated.
     """
     states = np.copy(np.reshape(states, (n_walkers, n_hopsperwalker)))
     states = states[:, n_removed:]
     states = np.reshape(states, (1,n_walkers*(n_hopsperwalker-n_removed)))
     return states[0]
 
-def error(pdff, param):
+def error(energies, num):
+    """Computes error with datablocking for a given sample of energies.
+    Parameters
+    ----------
+    energies: list
+        list of energy at each step
+    num: int
+        this is the largest value of b for which one wants to calculate the error.
+    Returns
+    -------
+    S_a: list
+        values of the error
+    
+    """
     b = 1
     N = int(n_used)
-    dist, accept_ratio, r_rp, rp_r = mcmc_sample(hops=n_samples, pdf = pdff, pdfparam=param)
-    R = np.array(dist[burn_in*n_walkers:])
-    #R = np.array(R)
-    S_a = np.zeros((N, 1))
-    for b in range(1, N):
+    P = energies
+    S_a = np.zeros((num, 1))
+    for b in range(1, num):
         Nb = int(N/b)
-        r=np.zeros(Nb)
-        R=R[:(Nb*b)]
-        R_shape=np.reshape(R, (Nb,b))
-        R = dist[burn_in*n_walkers:]
-        r = np.sum(R_shape, axis = 1)/b
-        S_a[b]=np.sqrt((1/(Nb-1))*(((1/Nb)*np.sum(np.square(r)))-np.square((1/Nb)*np.sum(r))))
+        p=np.zeros(Nb)
+        P=P[:(Nb*b)]
+        P_shape=np.reshape(P, (Nb,b))
+        P = np.copy(energies)
+        p = np.sum(P_shape, axis = 1)/b
+        S_a[b]=np.sqrt((1/(Nb-1))*(((1/Nb)*np.sum(np.square(p)))-np.square((1/Nb)*np.sum(p))))        #S_a[b]=np.sqrt((1/(Nb-1))*((1/b*np.sum(np.square(p)))-1/b**2*(np.sum(np.sum(p))**2)))
     return S_a
 
